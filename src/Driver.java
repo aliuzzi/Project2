@@ -37,7 +37,10 @@ public class Driver {
     CommandArguments commandArgs = new CommandArguments(args);
     
     TreeMap<String, TreeMap<Path, TreeSet<Integer>>> wordToFileMap = creatingOutput.getWordToFileMapForPath(commandArgs);
+    TreeMap<Path, Integer> wordCountMap = creatingOutput.getWordCountMap(commandArgs);
+    
     creatingOutput.writeToOutput(commandArgs, wordToFileMap);
+    creatingOutput.writeWordCountOutput(commandArgs, wordCountMap);
 
     // calculate time elapsed and output
     Duration elapsed = Duration.between(start, Instant.now());

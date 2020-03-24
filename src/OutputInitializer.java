@@ -5,6 +5,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -37,6 +38,17 @@ public class OutputInitializer {
 	   return wordToFileMap;
 	   
    }
+   
+   public TreeMap<Path, Integer> getWordCountMap(CommandArguments ca){
+	   List<Path> pathsList = getPathsList(ca);
+	   TreeMap<Path, Integer> wordCountMap = new TreeMap<Path, Integer>();
+	   for(Path file: pathsList) {
+		   List<String> fileWords = stemFile(file);
+		   wordCountMap.put(file, fileWords.size());
+	   }
+	   return wordCountMap;
+   }
+   
       /**
 	   * Processes the input file path argument
 	   *
@@ -70,7 +82,7 @@ public class OutputInitializer {
     	TextFileStemmer fileStemmer = new TextFileStemmer();
     	try {
 			return fileStemmer.listStems(file);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			System.out.println("File not found.");
 			return new ArrayList<>();
 		} 
@@ -116,7 +128,7 @@ public class OutputInitializer {
     }
     
       /**
-	   * Creating the inner TreeSet of positions in wihcih words were found
+	   * Creating the inner TreeSet of positions in which words were found
 	   *
 	   * @param file The current file to be stemmed
 	   * @param fileNameToPositionsMap the TreeMap of files and positions
@@ -159,6 +171,28 @@ public class OutputInitializer {
 	    	System.out.println("Writing to output file failure.");
 	    }
     }
+    
+    /**
+	   * Writes the necessary output to the proper Output File
+	   *
+	   * @param commandArgs Command Arguments provided by driver
+	   * @param wordToFileMap the Nested TreeMap 
+	   */
+  public void writeWordCountOutput(CommandArguments commandArgs, TreeMap<Path,Integer> wordCountMap) {
+		try {
+	    	if(commandArgs.getWordCountOutputFileName() != null) {
+	    		System.out.println("Writing word count to output file.");
+	    		BufferedWriter writer = new BufferedWriter(new FileWriter(commandArgs.getWordCountOutputFileName(), StandardCharsets.UTF_8));  
+	    		JSONWriter.asObject((Map)wordCountMap, writer, 0);
+	    		writer.close();
+	    	}else {
+	    		System.out.println("No output file provided");
+	    	}
+	  
+	    }catch(IOException e) {
+	    	System.out.println("Writing to output file failure.");
+	    }
+  }
 }
 
 

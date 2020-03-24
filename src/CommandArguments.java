@@ -238,7 +238,11 @@ public class CommandArguments{
     	}
     }
     
-    /**
+    public String getWordCountOutputFileName() {
+		return wordCountOutputFileName;
+	}
+
+	/**
      * Determines and sets what file to write the word count for each file. 
      * 
      * @return Word Count Output file path, default output file path, or null.

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-13">
 		<attributes>
 			<attribute name="module" value="true"/>
@@ -7,6 +8,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/opennlp-tools"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/open-nlp"/>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="/Users/angelicaliuzzi/Downloads/apache-opennlp-1.9.2/lib/opennlp-tools-1.9.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
