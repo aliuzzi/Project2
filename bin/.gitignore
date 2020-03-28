@@ -1,1 +1,5 @@
 /parseQueries.class
+/SearchResult.class
+/InvertedIndex.class
+/WordIndex.class
+/Index.class

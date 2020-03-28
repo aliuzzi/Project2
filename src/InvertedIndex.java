@@ -5,9 +5,13 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -20,7 +24,7 @@ import java.util.TreeSet;
  * @version Spring 2020
  */
 
-public class OutputInitializer {
+public class InvertedIndex {
 	  /**
 	   * Processes all word files into a Nested TreeMap.
 	   *
@@ -38,7 +42,12 @@ public class OutputInitializer {
 	   return wordToFileMap;
 	   
    }
-   
+      /**
+	   * Processes all word files into a Nested TreeMap.
+	   *
+	   * @param ca The command line arguments to be provided in Driver
+	   * @return wordCountMap the Nested Tree Map of the Words and their File + locations
+	   */
    public TreeMap<Path, Integer> getWordCountMap(CommandArguments ca){
 	   List<Path> pathsList = getPathsList(ca);
 	   TreeMap<Path, Integer> wordCountMap = new TreeMap<Path, Integer>();
@@ -193,6 +202,115 @@ public class OutputInitializer {
 	    	System.out.println("Writing to output file failure.");
 	    }
   }
+
+	/**
+	 * Adds the element and position.
+	 *
+	 * @param element  the element found
+	 * @param position the position the element was found
+	 * @return {@code true} if the index changed as a result of the call
+	 */
+	public <K,V> boolean add(String element, int position, TreeMap<String, Integer> treeMap) {
+
+		if (treeMap.containsKey(element) && treeMap.get(element) == position) {
+
+			return false;
+
+		} else if (treeMap.containsKey(element) && treeMap.get(element) != position) {
+
+			treeMap.compute(element, (key, val) -> (val == null) ? position : position);
+			return true;
+
+		} else if (!treeMap.containsKey(element)) {
+
+			treeMap.put(element, position);
+			return true;
+
+		}
+		return false;
+
+	}
+	
+	  /**
+	   * Returns the number of positions stored for the given element.
+	   *
+	   * @param element the element to lookup
+	   * @return 0 if the element is not in the index or has no positions, otherwise the number of
+	   *         positions stored for that element
+	   */
+	
+	
+	public int numPositions(String element, TreeMap<String, Integer> treeMap) {
+		
+		
+		if(treeMap.containsKey(element)) {
+			int numValues = treeMap.values().size();
+			return numValues;
+		}
+		return 0;
+	}
+	
+	 /**
+	   * Returns the number of element stored in the index.
+	   *
+	   * @return 0 if the index is empty, otherwise the number of element in the index
+	   */
+	
+	public int numElements(TreeMap<String, Integer> treeMap) {
+		if(treeMap.isEmpty()) {
+			return 0;
+		}
+		return treeMap.size();
+	}
+
+	
+	/**
+	   * Determines whether the element is stored in the index and the position is stored for that
+	   * element.
+	   *
+	   * @param element the element to lookup
+	   * @param position the position of that element to lookup
+	   * @return {@true} if the element and position is stored in the index
+	   */
+	public boolean contains(String element, int position, TreeMap<String, Integer> treeMap) {
+		if(treeMap.containsKey(element) && treeMap.get(element) == position) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	   * Returns an unmodifiable view of the elements stored in the index.
+	   *
+	   * @return an unmodifiable view of the elements stored in the index
+	   * @see Collections#unmodifiableCollection(Collection)
+	   */
+	public Collection getElements(TreeMap<String, Integer> treeMap) {
+		
+		Set<String> keys = treeMap.keySet();
+		
+		Set<String> unmodifiedElements = Collections.unmodifiableSet(keys);
+		
+		return unmodifiedElements;
+		
+	}
+	
+
+	 /**
+	   * Returns an unmodifiable view of the positions stored in the index for the provided element, or
+	   * an empty collection if the element is not in the index.
+	   *
+	   * @param element the element to lookup
+	   * @return an unmodifiable view of the positions stored for the element
+	   */
+	
+	public Collection getPositions(String element, TreeMap<String, Integer> treeMap) {
+		
+		SortedMap<String,Integer> unmodsortmap = Collections.unmodifiableSortedMap(treeMap);
+
+		return unmodsortmap.values();
+	}
+
 }
 
 

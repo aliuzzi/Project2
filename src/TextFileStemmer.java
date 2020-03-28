@@ -3,8 +3,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.ArrayList;
-import java.util.List;
+
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
@@ -21,7 +20,7 @@ public class TextFileStemmer {
 
   /** The default stemmer algorithm used by this class. */
 	
-  public final SnowballStemmer.ALGORITHM DEFAULT = SnowballStemmer.ALGORITHM.ENGLISH;
+  public final static SnowballStemmer.ALGORITHM DEFAULT = SnowballStemmer.ALGORITHM.ENGLISH;
 
 
   /**
@@ -117,6 +116,59 @@ public class TextFileStemmer {
 	       .forEach(it -> tSet.addAll(it));
 	  
 	  return tSet;  
+  }
+  
+  /**
+   * Stems all of the words in file
+   *
+   * @param file The current file to be stemmed
+   * @param commandArgs
+   * @param fileStemmer
+   * @return TreeSet fileStemme r.listStems(file) the stemmed file as an ArrayList of words
+   */
+
+public static List<TreeSet<String>> stemQueryFile(Path file, String queryFileName) {
+	// TreeSet<String> tSet = new TreeSet<String>();
+	try {
+		if (queryFileName != null) {
+			return uniqueStemsOfEachLine(file);
+			// uniqueStems Reads a file line by line, parses each line into cleaned and
+			// stemmed words, and then adds those words to a set.
+		} else {
+			System.out.println("No Query File Found");
+		}
+	} catch (Exception e) {
+		System.out.println("File not found.");
+
+	}
+	return new ArrayList<TreeSet<String>>();
+}
+  
+  /**
+   * Reads a file line by line, parses each line into cleaned and stemmed words, and then adds those
+   * words to a set.
+   *
+   * @param inputFile the input file to parse
+   * @return a sorted set of stems from file
+   * @throws IOException if unable to read or parse file
+   *
+   * @see #uniqueStems(String)
+   * @see TextParser#parse(String)
+   */
+  private static List<TreeSet<String>> uniqueStemsOfEachLine(Path file) throws IOException {
+	  List<TreeSet<String>> listOfTreeSetsForEachQuery = new ArrayList<TreeSet<String>>(); //list of stemmed word sets
+	  List<String> allLines = Files.readAllLines(file);
+	  Stemmer stemmer = new SnowballStemmer(DEFAULT);
+	  for(String line: allLines) {
+		  TreeSet<String> tSet = new TreeSet<String>();
+		  for(String word: TextParser.parse(line)) {
+			  tSet.add(stemmer.stem(word).toString());
+		  }
+		  listOfTreeSetsForEachQuery.add(tSet);
+	  }
+	  
+	  return listOfTreeSetsForEachQuery;  
+	  
   }
 
   /**

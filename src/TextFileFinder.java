@@ -50,14 +50,6 @@ public class TextFileFinder {
    *
    * @throws IOException if an I/O error occurs
    *
-   * @see #isText
-   * @see #isTextWithAttribute
-   *
-   * @see FileVisitOption#FOLLOW_LINKS
-   * @see Files#walk(Path, FileVisitOption...)
-   * @see Files#find(Path, int, java.util.function.BiPredicate, FileVisitOption...)
-   *
-   * @see Integer#MAX_VALUE
    */
   public Stream<Path> find(Path start) throws IOException {
 	  

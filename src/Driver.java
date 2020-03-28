@@ -33,7 +33,7 @@ public class Driver {
   public static void main(String[] args) {
     // store initial start time
     Instant start = Instant.now();
-    OutputInitializer creatingOutput = new OutputInitializer();
+    InvertedIndex creatingOutput = new InvertedIndex();
     CommandArguments commandArgs = new CommandArguments(args);
     
     TreeMap<String, TreeMap<Path, TreeSet<Integer>>> wordToFileMap = creatingOutput.getWordToFileMapForPath(commandArgs);

@@ -296,7 +296,14 @@ public class CommandArguments{
     	return indexOutputFilename;
     }
     
-    
+    /**
+     * Gets the output file name
+     *
+     * @return output file name
+     */
+    public String getResultOutputFile() {
+    	return resultsFileName;
+    }
     /**
      * Gets the output file Path
      *
@@ -341,6 +348,17 @@ public class CommandArguments{
 		if(queryFile != null) {
 			this.queryFilePath = getPath(queryFile);
 		}
+	}
+	
+	/**
+     * Checks whether an exact search should be performed
+     * @return boolean 
+     */
+	public boolean exactSearch() {
+		if (map.containsKey("-exact")){
+			return true;
+		}
+		return false;
 	}
 	
 	  
