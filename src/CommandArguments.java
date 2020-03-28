@@ -227,11 +227,11 @@ public class CommandArguments{
      * @return Word Count Output file path, default output file path, or null.
      */
     public String determineWordCountOutputFile() {
-    	if(map.containsKey("-count")) {
-    		if(map.get("-count") == null) {
+    	if(map.containsKey("-counts")) {
+    		if(map.get("-counts") == null) {
     			return "counts.json";
     		}else {
-    			return map.get("-count");
+    			return map.get("-counts");
     		}
     	}else {
     		return null;
@@ -302,6 +302,7 @@ public class CommandArguments{
      * @return output file name
      */
     public String getResultOutputFile() {
+    	System.out.println(resultsFileName);
     	return resultsFileName;
     }
     /**

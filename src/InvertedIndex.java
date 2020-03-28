@@ -53,7 +53,9 @@ public class InvertedIndex {
 	   TreeMap<Path, Integer> wordCountMap = new TreeMap<Path, Integer>();
 	   for(Path file: pathsList) {
 		   List<String> fileWords = stemFile(file);
-		   wordCountMap.put(file, fileWords.size());
+		   if(fileWords.size() != 0) {
+			   wordCountMap.put(file, fileWords.size());
+		   }
 	   }
 	   return wordCountMap;
    }
@@ -173,7 +175,7 @@ public class InvertedIndex {
 	    		
 	    		writer.close();
 	    	}else {
-	    		System.out.println("No output file provided");
+	    		System.out.println("No index output file provided");
 	    	}
 	  
 	    }catch(IOException e) {
@@ -191,15 +193,17 @@ public class InvertedIndex {
 		try {
 	    	if(commandArgs.getWordCountOutputFileName() != null) {
 	    		System.out.println("Writing word count to output file.");
+	    		System.out.println("Word Count Output File: " + commandArgs.getWordCountOutputFileName());
+	    		
 	    		BufferedWriter writer = new BufferedWriter(new FileWriter(commandArgs.getWordCountOutputFileName(), StandardCharsets.UTF_8));  
 	    		JSONWriter.asObject((Map)wordCountMap, writer, 0);
 	    		writer.close();
 	    	}else {
-	    		System.out.println("No output file provided");
+	    		System.out.println("No word count output file provided");
 	    	}
 	  
 	    }catch(IOException e) {
-	    	System.out.println("Writing to output file failure.");
+	    	System.out.println("Writing word count to output file failure.");
 	    }
   }
 

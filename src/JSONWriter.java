@@ -47,20 +47,23 @@ public class JSONWriter {
       Iterator<Object> it = elements.iterator();
       writer.append("[\n");
       
-      if(it.hasNext()) {
-        indent(it.next().toString(),writer, level+1);
-        
-      }
       
       while(it.hasNext()) {
-        writer.append(",\n");
         indent(writer, level+1);
-        writer.append(it.next().toString());
-//        if(!it.hasNext()) {
-//            indent(it.next().toString(),writer, level+1);
-//            
-//          }
+         
+        Object value = it.next();
+        if (value instanceof Map) {
+        	asNestedArray((Map) value, writer, level+1);
+        } else if (value instanceof Collection) {
+            asArray((Collection) value, writer, level+1);
+        } else {
+        	writer.append(asValue(value));
+        }       
         
+        
+        if(it.hasNext()){
+        	writer.append(",\n");
+        }
       }
         
 
@@ -102,7 +105,7 @@ public class JSONWriter {
    * @param level the initial indent level
    * @throws IOException if an IO error occurs
    */
-  public static void asObject(Map<String, Integer> elements, Writer writer, int level) throws IOException{
+  public static void asObject(Map<Object, Integer> elements, Writer writer, int level) throws IOException{
     
 	if(writer == null) {
 	   throw new IOException("No writer found.");
@@ -116,26 +119,27 @@ public class JSONWriter {
     
     try {
       writer.append("{\n");  
-      Iterator<Map.Entry<String, Integer>> entries = elements.entrySet().iterator();  
+      Iterator<Map.Entry<Object, Integer>> entries = elements.entrySet().iterator();  
       
       
       if(entries.hasNext()) {
-        Map.Entry<String, Integer> entry = entries.next();
+        Map.Entry<Object, Integer> entry = entries.next();
         indent(writer, level+1);
-        writer.append("\"" + entry.getKey() + "\": " + entry.getValue().toString());  //wraps key in quotes
+        writer.append("\"" + entry.getKey().toString() + "\": " + entry.getValue().toString());  //wraps key in quotes
       } 
       
       while(entries.hasNext()) {
-        Map.Entry<String, Integer> entry = entries.next();
+        Map.Entry<Object, Integer> entry = entries.next();
         writer.append(",\n");
         indent(writer, level+1);
         writer.append("\"" + entry.getKey() + "\": " + entry.getValue().toString()); //wrapping key in quotes 
       }
       
       if(!elements.isEmpty()) {
-    	 indent("\n}", writer, level);
+    	  indent("\n}", writer, level);
+      }else{
+    	  indent("}", writer, level);
       }
-        indent("}", writer, level);
      
       
       
@@ -154,7 +158,7 @@ public class JSONWriter {
    *
    * @see #asObject(Map, Writer, int)
    */
-  public static void asObject(Map<String, Integer> elements, Path path) throws IOException {
+  public static void asObject(Map<Object, Integer> elements, Path path) throws IOException {
     // THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
     try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
       asObject(elements, writer, 0);
@@ -169,7 +173,7 @@ public class JSONWriter {
    *
    * @see #asObject(Map, Writer, int)
    */
-  public static String asObject(Map<String, Integer> elements) {
+  public static String asObject(Map<Object, Integer> elements) {
     // THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
     try {
       StringWriter writer = new StringWriter();
@@ -178,6 +182,23 @@ public class JSONWriter {
     } catch (IOException e) {
       return null;
     }
+  }
+  
+  public static String asValue(Object value) {
+	if(value instanceof String) {
+		return "\"" + value +"\"";
+		
+	}else if( value instanceof Integer) {
+		return value.toString();
+		
+	}else if(value instanceof Double) {
+		String formatted = String.format("%.8f", value);
+		return formatted;
+	}else {
+		System.out.println("Error");
+		return "error";
+	}
+	
   }
   
 
@@ -212,24 +233,8 @@ public class JSONWriter {
 
       writer.append("{\n");  //done 
       
-      if(it.hasNext()) {
-        Object key = it.next();
-        quote(key.toString(), writer, level + 1);
-        writer.append(": ");
-        Object value = elements.get(key);
-        if (value instanceof Map) {
-        	asNestedArray((Map<String, ? extends Collection<Integer>>) value, writer, level+1);
-        } else if (value instanceof Collection) {
-            asArray((Collection) value, writer, level+1);
-        } else {
-        	System.out.print("json error in recursion");
-        }
-      } 
-      
       while(it.hasNext()) {
-        writer.append(",");
         
-        writer.append("\n");
         Object key = it.next();
         quote(key.toString(), writer, level+1);
         
@@ -241,7 +246,12 @@ public class JSONWriter {
         } else if (value instanceof Collection) {
             asArray((Collection) value, writer, level+1);
         } else {
-        	System.out.print("json error in recursion #2");
+        	writer.append(asValue(value));
+        }
+        
+
+        if(it.hasNext()) {
+            writer.append(",\n");
         }
 
       }

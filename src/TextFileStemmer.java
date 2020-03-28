@@ -148,16 +148,16 @@ public static List<TreeSet<String>> stemQueryFile(Path file, String queryFileNam
    * Reads a file line by line, parses each line into cleaned and stemmed words, and then adds those
    * words to a set.
    *
-   * @param inputFile the input file to parse
+   * @param queryFile the input file to parse
    * @return a sorted set of stems from file
    * @throws IOException if unable to read or parse file
    *
    * @see #uniqueStems(String)
    * @see TextParser#parse(String)
    */
-  private static List<TreeSet<String>> uniqueStemsOfEachLine(Path file) throws IOException {
+  private static List<TreeSet<String>> uniqueStemsOfEachLine(Path queryFile) throws IOException {
 	  List<TreeSet<String>> listOfTreeSetsForEachQuery = new ArrayList<TreeSet<String>>(); //list of stemmed word sets
-	  List<String> allLines = Files.readAllLines(file);
+	  List<String> allLines = Files.readAllLines(queryFile);
 	  Stemmer stemmer = new SnowballStemmer(DEFAULT);
 	  for(String line: allLines) {
 		  TreeSet<String> tSet = new TreeSet<String>();

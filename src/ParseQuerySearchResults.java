@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,7 +16,7 @@ import java.util.TreeSet;
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
-public class parseQueries {
+public class ParseQuerySearchResults {
 
 
 	
@@ -32,11 +33,10 @@ public class parseQueries {
 	 * @param commandArgs
 	 * @return listOfSearchResults the stemmed words as an ArrayList of strings - query words
 	 */
-	public List<SearchResult> search(TreeSet<String> query,
+	public List<Map<String,Object>> search(TreeSet<String> query,
 			TreeMap<String, TreeMap<Path, TreeSet<Integer>>> wordToFileMap, TreeMap<Path, Integer> wordCountMap, CommandArguments commandArgs) {
 
 		TreeMap<Path, SearchResult> matches = new TreeMap<Path, SearchResult>();
-		List<SearchResult> listOfSearchResults = new ArrayList<SearchResult>();
 
 		for (String queryWord : query) {
 			for (String wordInIndexMap: wordToFileMap.keySet()) {
@@ -63,9 +63,17 @@ public class parseQueries {
 			}
 
 		}
+		
+
+		List<SearchResult> listOfSearchResults = new ArrayList<SearchResult>();
 		listOfSearchResults.addAll(matches.values());
 		Collections.sort(listOfSearchResults);
-		return listOfSearchResults;
+		
+		List<Map<String, Object>> listOfSearchResultsAsMap = new ArrayList<Map<String, Object>>();
+		for(SearchResult entry: listOfSearchResults) {
+			listOfSearchResultsAsMap.add(entry.getMapOutput());
+		}
+		return listOfSearchResultsAsMap;
 	}
 	
 	/**
@@ -73,26 +81,26 @@ public class parseQueries {
 	 *
 	 * @param queryList   unique stemmed words
 	 * @param fileStemmer
-	 * @param file
 	 * @param index
 	 * @param commandArgs
 	 * @return mapOfAllQuerySearches the TreeMap of all query searches and their
 	 *         search results
+	 *         
 	 */
 
-	public TreeMap<TreeSet<String>, List<SearchResult>> getSearchResultForEveryQuery(Path file,
-			List<TreeSet<String>> queryList, TextFileStemmer fileStemmer, CommandArguments commandArgs,
+	public TreeMap<String, List<Map<String, Object>>> getSearchResultForEveryQuery(
+			List<TreeSet<String>> queryList, CommandArguments commandArgs,
 			InvertedIndex index) {
-		TreeMap<TreeSet<String>, List<SearchResult>> mapOfAllQuerySearches = new TreeMap<TreeSet<String>, List<SearchResult>>();
-
-		queryList = TextFileStemmer.stemQueryFile(commandArgs.getQueryFilePath(), commandArgs.getQueryFileName());
+		TreeMap<String, List<Map<String, Object>>> mapOfAllQuerySearches = new TreeMap<String, List<Map<String, Object>>>();
 		// returns listOfTreeSetsForEachQuery List<TreeSet<String>>
 		// listOfTreeSetsForEachQuery
 		for (TreeSet<String> searchQuery : queryList) {
-			List<SearchResult> listOfSearchResultsForAQuery = search(searchQuery,
+			if(!searchQuery.isEmpty() ) {
+			List<Map<String, Object>> listOfSearchResultsForAQuery = search(searchQuery,
 					index.getWordToFileMapForPath(commandArgs), index.getWordCountMap(commandArgs), commandArgs);
-			mapOfAllQuerySearches.put(searchQuery, listOfSearchResultsForAQuery);
+			mapOfAllQuerySearches.put(String.join(" ", searchQuery), listOfSearchResultsForAQuery);
 
+			}
 		}
 
 		return mapOfAllQuerySearches;
@@ -106,21 +114,22 @@ public class parseQueries {
 	 * @param wordToFileMap the Nested TreeMap
 	 */
 	public void writeSearchQueryResultsToOutput(CommandArguments commandArgs,
-			TreeMap<TreeSet<String>, List<SearchResult>> mapOfAllQuerySearches) {
+			TreeMap<String, List<Map<String, Object>>> mapOfAllQuerySearches) {
 		try {
 			if (commandArgs.getResultOutputFile() != null) {
 				System.out.println("Writing search query results to output file.");
+				System.out.println("Result file "+ commandArgs.getResultOutputFile());
 				BufferedWriter writer = new BufferedWriter(
-						new FileWriter(commandArgs.getOutputFile(), StandardCharsets.UTF_8));
+						new FileWriter(commandArgs.getResultOutputFile(), StandardCharsets.UTF_8));
 				JSONWriter.asNestedArray((Map) mapOfAllQuerySearches, writer, 0);
 
 				writer.close();
 			} else {
-				System.out.println("No output file provided");
+				System.out.println("No query results output file provided");
 			}
 
 		} catch (IOException e) {
-			System.out.println("Writing to output file failure.");
+			System.out.println("Writing search result output file failure.");
 		}
 	}
 

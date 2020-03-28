@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -33,14 +34,17 @@ public class Driver {
   public static void main(String[] args) {
     // store initial start time
     Instant start = Instant.now();
-    InvertedIndex creatingOutput = new InvertedIndex();
+    InvertedIndex invertedIndex = new InvertedIndex();
     CommandArguments commandArgs = new CommandArguments(args);
+    ParseQuerySearchResults querySearch = new ParseQuerySearchResults();
     
-    TreeMap<String, TreeMap<Path, TreeSet<Integer>>> wordToFileMap = creatingOutput.getWordToFileMapForPath(commandArgs);
-    TreeMap<Path, Integer> wordCountMap = creatingOutput.getWordCountMap(commandArgs);
+    TreeMap<String, TreeMap<Path, TreeSet<Integer>>> wordToFileMap = invertedIndex.getWordToFileMapForPath(commandArgs);
+    TreeMap<Path, Integer> wordCountMap = invertedIndex.getWordCountMap(commandArgs);
+    TreeMap<String, List<Map<String, Object>>> mapOfAllQuerySearches = querySearch.getSearchResultForEveryQuery(TextFileStemmer.stemQueryFile(commandArgs.getQueryFilePath(), commandArgs.getQueryFileName()), commandArgs, invertedIndex);
     
-    creatingOutput.writeToOutput(commandArgs, wordToFileMap);
-    creatingOutput.writeWordCountOutput(commandArgs, wordCountMap);
+    invertedIndex.writeToOutput(commandArgs, wordToFileMap);
+    invertedIndex.writeWordCountOutput(commandArgs, wordCountMap);
+    querySearch.writeSearchQueryResultsToOutput(commandArgs, mapOfAllQuerySearches);
 
     // calculate time elapsed and output
     Duration elapsed = Duration.between(start, Instant.now());
